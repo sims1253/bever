@@ -20,6 +20,10 @@ Each file holds one BEVE object:
 
 The writer ignores all of CmdStan's text output. The file has no configuration, step size, adapted metric, timing or chain id. If you save warmup draws, they are in the same matrix as the sampling draws, and nothing marks where warmup ends.
 
+## Limits
+
+bever trusts the file. It checks that the names, the row and column counts and the data agree, and a truncated file gives an error. It does not check a count against the size of the file, so a corrupt count can make bever ask R for much more memory than the file holds. bever ignores any bytes after the object. Read only files that the fork wrote.
+
 ## Install and use
 
 You need Rust 1.96.1 or later.
@@ -37,7 +41,7 @@ colnames(draws)
 summary(draws[, "mu"])
 ```
 
-`read_beve_stan()` is the only function. It returns a double matrix with one row per draw and the CmdStan names as column names. A missing, truncated or malformed file gives an R error.
+`read_beve_stan()` is the only function. It returns a double matrix with one row per draw and the CmdStan names as column names. A missing or truncated file, or one whose header and data disagree, gives an R error.
 
 ## Benchmark
 
