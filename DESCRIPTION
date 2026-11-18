@@ -3,8 +3,9 @@ Title: Read BEVE Draws Files from an Experimental CmdStan Fork
 Version: 0.1.0
 Authors@R: person("Maximilian", "Scholz", role = c("aut", "cre"), email = "dev.scholz@mailbox.org")
 Description: Reads the BEVE (Binary Efficient Versatile Encoding) files of
-    posterior draws written by the experimental 'sims1253/cmdstan' fork into a
-    matrix. No released 'CmdStan' writes this format.
+    posterior draws that revision 64659d8 of the experimental 'sims1253/cmdstan'
+    fork wrote, into a matrix. Later revisions of the fork do not write this
+    format, and no released 'CmdStan' writes it.
 License: MIT + file LICENSE
 Encoding: UTF-8
 SystemRequirements: Cargo (Rust's package manager), rustc >= 1.96.1

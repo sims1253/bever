@@ -4,11 +4,16 @@
 \name{bever-package}
 \alias{bever}
 \alias{bever-package}
-\title{bever: Read BEVE Binary Files from CmdStan}
+\title{bever: Read BEVE Draws Files from an Experimental CmdStan Fork}
 \description{
-Reads BEVE format files produced by CmdStan with format=beve option.
+Reads the BEVE (Binary Efficient Versatile Encoding) files of posterior draws that revision 64659d8 of the experimental 'sims1253/cmdstan' fork wrote, into a matrix. Later revisions of the fork do not write this format, and no released 'CmdStan' writes it.
 }
 \author{
 \strong{Maintainer}: Maximilian Scholz \email{dev.scholz@mailbox.org}
+
+Authors:
+\itemize{
+  \item Maximilian Scholz \email{dev.scholz@mailbox.org}
+}
 
 }

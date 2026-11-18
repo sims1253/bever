@@ -1,7 +1,8 @@
 #' Read a BEVE draws file written by the sims1253/cmdstan fork
 #'
-#' Reads the `.beve` file that the experimental `sims1253/cmdstan` fork writes
-#' with its BEVE output option. No released CmdStan writes this format.
+#' Reads a `.beve` file that revision 64659d8 of the experimental
+#' `sims1253/cmdstan` fork wrote with `output format=beve`. Later revisions of
+#' the fork do not write this format, and no released CmdStan writes it.
 #'
 #' @param path Path to the `.beve` file.
 #' @return A double matrix with one row per draw and one column per CmdStan

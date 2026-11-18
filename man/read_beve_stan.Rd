@@ -16,8 +16,9 @@ A double matrix with one row per draw and one column per CmdStan
   such as `"theta[1]"`.
 }
 \description{
-Reads the `.beve` file that the experimental `sims1253/cmdstan` fork writes
-with its BEVE output option. No released CmdStan writes this format.
+Reads a `.beve` file that revision 64659d8 of the experimental
+`sims1253/cmdstan` fork wrote with `output format=beve`. Later revisions of
+the fork do not write this format, and no released CmdStan writes it.
 }
 \examples{
 path <- system.file("extdata", "draws.beve", package = "bever")

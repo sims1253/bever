@@ -6,7 +6,7 @@ bever reads a BEVE file of posterior draws into an R matrix. The file comes from
 
 bever is experimental, and it will not get new features. The repository will be archived.
 
-No released CmdStan writes BEVE. Only the `develop` branch of the fork [sims1253/cmdstan](https://github.com/sims1253/cmdstan/tree/develop) writes it (the writer is `src/cmdstan/io/beve_writer.hpp`). The fork uses the [glaze](https://github.com/stephenberry/glaze) library to write BEVE, and glaze needs C++23, a newer standard than Stan targets. The format was discussed in [Proof of concept: binary output format for CmdStan](https://discourse.mc-stan.org/t/proof-of-concept-binary-output-format-for-cmdstan/40846), and cmdstanr is moving to Parquet instead.
+No released CmdStan writes BEVE. The fork sims1253/cmdstan wrote it with `output format=beve` at revision [64659d8](https://github.com/sims1253/cmdstan/tree/64659d87f3438d9e9fe48d309e8f72c3dee1590b) (the writer is `src/cmdstan/io/beve_writer.hpp`). The fork's `develop` branch no longer accepts `format=beve`, so bever reads only files that this revision already wrote. The fork uses the [glaze](https://github.com/stephenberry/glaze) library to write BEVE, and glaze needs C++23, a newer standard than Stan targets. The format was discussed in [Proof of concept: binary output format for CmdStan](https://discourse.mc-stan.org/t/proof-of-concept-binary-output-format-for-cmdstan/40846), and cmdstanr is moving to Parquet instead.
 
 ## What the file holds
 
