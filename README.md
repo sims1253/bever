@@ -22,7 +22,7 @@ The writer ignores all of CmdStan's text output. The file has no configuration, 
 
 ## Limits
 
-bever trusts the file. It checks that the names, the row and column counts and the data agree, and a truncated file gives an error. It does not check a count against the size of the file, so a corrupt count can make bever ask R for much more memory than the file holds. bever ignores any bytes after the object. Read only files that the fork wrote.
+bever trusts the file. It checks that the names, the row and column counts and the data agree, and that the matrix fits in the file. A truncated file gives an error. A corrupt length inside a column makes bever read the rest of the file as draws before it fails: for a 76 MiB file, peak memory rose by about 90 MiB. bever ignores any bytes after the object. Read only files that the fork wrote.
 
 ## Install and use
 
