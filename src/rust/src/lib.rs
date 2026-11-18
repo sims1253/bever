@@ -72,7 +72,7 @@ fn read(path: &str) -> std::result::Result<RMatrix<f64>, String> {
 
     let mut m = output.data.0;
     let (nrow, ncol) = (m.nrows(), m.ncols());
-    // A file with no columns carries rows = 0 even when the header says otherwise.
+    // With no columns the data cannot show a row count, so only compare rows when ncol > 0.
     if ncol != output.cols || output.names.len() != ncol || (ncol > 0 && nrow != output.rows) {
         return Err(format!(
             "'{path}' is inconsistent: header says {} x {} with {} names, data is {nrow} x {ncol}",
