@@ -26,7 +26,7 @@ bever trusts the file. It checks that the number of names, the column count and 
 
 Some damage costs memory before the error. A corrupt length of a column can make bever read the rest of the file as draws: for a 76 MiB file, peak memory rose by about 90 MiB. A corrupt length of a name can make bever reserve and fill that many bytes, whatever the size of the file, when at least 8 MiB of the file follow the length field. One flipped bit in the length of `lp__` raised peak memory by about 380 MiB, both for a 16 MiB file and for a 76 MiB file.
 
-When R cannot allocate the matrix, for example under a limit set with `mem.maxVSize()`, bever gives an ordinary error and closes the file, and R also prints its own message.
+When R cannot allocate the matrix, for example under a limit set with `mem.maxVSize()`, bever gives an ordinary error and closes the file, and R may also print its own message.
 
 bever ignores any bytes after the object. Read only files that the fork wrote.
 
