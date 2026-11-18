@@ -14,12 +14,12 @@ rscript <- file.path(R.home("bin"), "Rscript")
 res <- do.call(rbind, lapply(names(readers), function(r) {
   do.call(rbind, lapply(c("100", "10000"), function(n) {
     line <- system2(rscript, c(file.path(here, "bench-one.R"), r, n, dir, reps), stdout = TRUE)
-    read.delim(text = line, header = FALSE, col.names = c("reader", "n", "s", "mb"))
+    read.delim(text = line, header = FALSE, col.names = c("reader", "n", "s", "mib"))
   }))
 }))
 cell <- function(r, n) {
   x <- res[res$reader == r & res$n == n, ]
-  sprintf("%.3f s / %.0f MB", x$s, x$mb)
+  sprintf("%.3f s / %.0f MiB", x$s, x$mib)
 }
 cat("| Reader | 107 columns | 10,007 columns |\n|---|---|---|\n")
 for (r in names(readers)) cat(sprintf("| %s | %s | %s |\n", readers[[r]], cell(r, 100), cell(r, 10000)))

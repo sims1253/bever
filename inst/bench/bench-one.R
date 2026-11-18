@@ -2,6 +2,7 @@
 #   Rscript inst/bench/bench-one.R <reader> <N> <input dir> [reps]
 # Peak extra memory is the rise in the process's resident high-water mark
 # (VmHWM, Linux only) over the first call, after all packages are loaded.
+# VmHWM is in kB (1024 bytes), so dividing by 1024 gives MiB.
 args <- commandArgs(TRUE)
 reader <- args[1]; n <- args[2]; dir <- args[3]
 reps <- if (length(args) > 3) as.integer(args[4]) else 5L
@@ -17,13 +18,13 @@ run <- switch(reader,
   pure_r = function() read_beve_r(beve),
   stop("unknown reader ", reader)
 )
-hwm_mb <- function() {
+hwm_mib <- function() {
   line <- grep("^VmHWM", readLines("/proc/self/status"), value = TRUE)
   as.numeric(gsub("\\D", "", line)) / 1024
 }
 for (p in c("cmdstanr", "posterior", "data.table", "bever")) invisible(loadNamespace(p))
-before <- hwm_mb()
+before <- hwm_mib()
 invisible(run())
-peak <- hwm_mb() - before
+peak <- hwm_mib() - before
 times <- replicate(reps, system.time(run())[["elapsed"]])
 cat(sprintf("%s\t%s\t%.3f\t%.0f\n", reader, n, median(times), peak))

@@ -49,11 +49,11 @@ These numbers come from one chain of 1000 draws of `vector[N] z ~ std_normal()`,
 
 | Reader | 107 columns | 10,007 columns |
 |---|---|---|
-| cmdstanr full read | 0.101 s / 13 MB | 2.610 s / 380 MB |
-| cmdstanr, one variable | 0.024 s / 8 MB | 0.945 s / 113 MB |
-| data.table::fread | 0.013 s / 3 MB | 1.018 s / 265 MB |
-| bever | 0.001 s / 4 MB | 0.188 s / 78 MB |
-| base R reader | 0.004 s / 9 MB | 0.472 s / 116 MB |
+| cmdstanr full read | 0.101 s / 13 MiB | 2.610 s / 380 MiB |
+| cmdstanr, one variable | 0.024 s / 8 MiB | 0.945 s / 113 MiB |
+| data.table::fread | 0.013 s / 3 MiB | 1.018 s / 265 MiB |
+| bever | 0.001 s / 4 MiB | 0.188 s / 78 MiB |
+| base R reader | 0.004 s / 9 MiB | 0.472 s / 116 MiB |
 
 The machine was an AMD Ryzen 5 PRO 5650U with R 4.6.2, cmdstanr 0.9.0, posterior 1.7.0, data.table 1.18.6.1 and rustc 1.98.1. Other jobs used the CPU during the run (load average 16 to 24 on 12 threads). A second run under more load took about three times as long for every reader, with the readers in the same order. The memory figures changed by less than 10 percent between the two runs.
 
