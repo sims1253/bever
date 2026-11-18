@@ -7,6 +7,6 @@ edition = "2021"
 crate-type = ["staticlib"]
 
 [dependencies]
-extendr-api = "0.6"
+extendr-api = "0.9"
 beve = "0.4"
 serde = { version = "1", features = ["derive"] }
