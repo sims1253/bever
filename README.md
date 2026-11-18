@@ -22,7 +22,13 @@ The writer ignores all of CmdStan's text output. The file has no configuration, 
 
 ## Limits
 
-bever trusts the file. It checks that the names, the row and column counts and the data agree, and that the matrix fits in the file. A truncated file gives an error. A corrupt length inside a column makes bever read the rest of the file as draws before it fails: for a 76 MiB file, peak memory rose by about 90 MiB. bever ignores any bytes after the object. Read only files that the fork wrote.
+bever trusts the file. It checks that the number of names, the column count and the data agree, and that every column has the same length. When there is at least one column, it also checks that this length matches the row count. It refuses a matrix that is too large for R or larger than the file. A truncated file gives an error.
+
+Some damage costs memory before the error. A corrupt length of a column can make bever read the rest of the file as draws: for a 76 MiB file, peak memory rose by about 90 MiB. A corrupt length of a name can make bever reserve and fill that many bytes, whatever the size of the file, once 8 MiB of the file follow the name. One flipped bit in the length of `lp__` raised peak memory by about 380 MiB, both for a 16 MiB file and for a 76 MiB file.
+
+When R itself cannot allocate the matrix, for example under a limit set with `mem.maxVSize()`, the error comes from R, and the file stays open until the R session ends.
+
+bever ignores any bytes after the object. Read only files that the fork wrote.
 
 ## Install and use
 
