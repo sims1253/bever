@@ -8,7 +8,7 @@ reps <- if (length(args) > 1) args[2] else "5"
 here <- dirname(normalizePath(sub("^--file=", "", grep("^--file=", commandArgs(FALSE), value = TRUE))))
 readers <- c(
   cmdstanr_full = "cmdstanr full read", cmdstanr_one = "cmdstanr, one variable",
-  fread = "data.table::fread", bever = "bever", pure_r = "pure R reader"
+  fread = "data.table::fread", bever = "bever", pure_r = "base R reader"
 )
 rscript <- file.path(R.home("bin"), "Rscript")
 res <- do.call(rbind, lapply(names(readers), function(r) {

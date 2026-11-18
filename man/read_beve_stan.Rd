@@ -23,5 +23,5 @@ with its BEVE output option. No released CmdStan writes this format.
 path <- system.file("extdata", "draws.beve", package = "bever")
 draws <- read_beve_stan(path)
 dim(draws)
-colMeans(draws)
+summary(draws[, "mu"])
 }
