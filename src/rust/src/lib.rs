@@ -29,14 +29,6 @@ fn read_beve(path: &str) -> List {
         }
     };
     
-    // Convert column-major to row-major for R matrix
-    let mut matrix_data: Vec<f64> = Vec::with_capacity(output.rows * output.cols);
-    for row in 0..output.rows {
-        for col in 0..output.cols {
-            matrix_data.push(output.data[col][row]);
-        }
-    }
-    
     // Create R matrix (R stores column-major, so we transpose)
     let rmatrix = RMatrix::new_matrix(output.rows, output.cols, |r, c| {
         output.data[c][r]
