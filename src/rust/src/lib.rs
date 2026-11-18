@@ -63,7 +63,10 @@ impl<'de> Visitor<'de> for ColumnsVisitor {
         if j != ncol {
             return Err(de::Error::custom("fewer columns than announced"));
         }
-        Ok(Columns(matrix.unwrap_or_else(|| RMatrix::new(0, 0))))
+        match matrix {
+            Some(m) => Ok(Columns(m)),
+            None => new_matrix(0, 0).map(Columns),
+        }
     }
 }
 
@@ -89,8 +92,8 @@ impl Drop for FileLen {
 }
 
 /// Allocate the matrix, or refuse dimensions R would reject or the file cannot
-/// fill. R raises its own error by a long jump that skips Rust cleanup, so it
-/// must not see them.
+/// fill. A plain R allocation raises its error by a long jump that skips Rust
+/// cleanup, so the matrix is made through R_tryEval instead.
 fn new_matrix<E: de::Error>(nrow: usize, ncol: usize) -> std::result::Result<RMatrix<f64>, E> {
     // R_XLEN_T_MAX, the longest vector R allocates.
     const R_MAX_LEN: u64 = 1 << 52;
@@ -106,7 +109,11 @@ fn new_matrix<E: de::Error>(nrow: usize, ncol: usize) -> std::result::Result<RMa
             "{nrow} x {ncol} needs {bytes} bytes, more than the file's {file_len}"
         )));
     }
-    Ok(RMatrix::new(nrow, ncol))
+    // R_tryEval turns an R error, such as a failed allocation, into an Err.
+    lang!("matrix", 0.0, nrow = nrow as i32, ncol = ncol as i32)
+        .eval_with_env(&base_env())
+        .and_then(|m| RMatrix::try_from(&m))
+        .map_err(|_| E::custom(format!("R could not allocate a {nrow} x {ncol} matrix")))
 }
 
 fn read(path: &str) -> std::result::Result<RMatrix<f64>, String> {
