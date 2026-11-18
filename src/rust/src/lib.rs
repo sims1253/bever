@@ -66,10 +66,9 @@ impl<'de> Visitor<'de> for ColumnsVisitor {
 }
 
 fn read(path: &str) -> std::result::Result<RMatrix<f64>, String> {
-    let bytes = std::fs::read(path).map_err(|e| format!("cannot read '{path}': {e}"))?;
-    let output: StanOutput =
-        beve::from_slice(&bytes).map_err(|e| format!("cannot parse '{path}' as BEVE draws: {e}"))?;
-    drop(bytes);
+    let file = std::fs::File::open(path).map_err(|e| format!("cannot read '{path}': {e}"))?;
+    let output: StanOutput = beve::from_reader_streaming(std::io::BufReader::new(file))
+        .map_err(|e| format!("cannot parse '{path}' as BEVE draws: {e}"))?;
 
     let mut m = output.data.0;
     let (nrow, ncol) = (m.nrows(), m.ncols());

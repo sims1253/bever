@@ -5,7 +5,7 @@ Authors@R: person("Maximilian", "Scholz", role = c("aut", "cre"), email = "dev.s
 Description: Reads BEVE format files produced by CmdStan with format=beve option.
 License: MIT + file LICENSE
 Encoding: UTF-8
-SystemRequirements: Cargo (Rust package manager), rustc
+SystemRequirements: Cargo (Rust's package manager), rustc >= 1.96.1
 Config/rextendr/version: 0.4.2
 NeedsCompilation: yes
 Depends: R (>= 4.2)
