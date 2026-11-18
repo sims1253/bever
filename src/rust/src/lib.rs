@@ -43,10 +43,11 @@ impl<'de> Visitor<'de> for ColumnsVisitor {
             if j == ncol {
                 return Err(de::Error::custom("more columns than announced"));
             }
-            let m = matrix.get_or_insert_with(|| {
+            if matrix.is_none() {
                 nrow = column.len();
-                RMatrix::new(nrow, ncol)
-            });
+                matrix = Some(new_matrix(nrow, ncol)?);
+            }
+            let m = matrix.as_mut().unwrap();
             if column.len() != nrow {
                 return Err(de::Error::custom(format!(
                     "column {} has {} rows, column 1 has {}",
@@ -62,6 +63,20 @@ impl<'de> Visitor<'de> for ColumnsVisitor {
             return Err(de::Error::custom("fewer columns than announced"));
         }
         Ok(Columns(matrix.unwrap_or_else(|| RMatrix::new(0, 0))))
+    }
+}
+
+/// Allocate the matrix, or refuse dimensions R would reject. R raises its own
+/// error by a long jump that skips Rust cleanup, so it must not see them.
+fn new_matrix<E: de::Error>(nrow: usize, ncol: usize) -> std::result::Result<RMatrix<f64>, E> {
+    // R_XLEN_T_MAX, the longest vector R allocates.
+    const R_MAX_LEN: usize = 1 << 52;
+    let fits = |n: usize| i32::try_from(n).is_ok();
+    match nrow.checked_mul(ncol) {
+        Some(len) if fits(nrow) && fits(ncol) && len <= R_MAX_LEN => Ok(RMatrix::new(nrow, ncol)),
+        _ => Err(E::custom(format!(
+            "{nrow} x {ncol} is too large for an R matrix"
+        ))),
     }
 }
 

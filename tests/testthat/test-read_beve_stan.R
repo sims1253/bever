@@ -51,3 +51,15 @@ test_that("a header that disagrees with the data gives an R error", {
   writeBin(bytes, bad)
   expect_error(read_beve_stan(bad), "inconsistent")
 })
+
+test_that("a column count too large for R gives an R error", {
+  bytes <- readBin(fixture, "raw", file.size(fixture))
+  # After the "data" key come the array header (0x05) and the column count,
+  # 7 in one byte (7 * 4 = 0x1c). Write 2^31 in the eight-byte form instead.
+  at <- grepRaw(charToRaw("data"), bytes) + 5L
+  expect_identical(bytes[at], as.raw(0x1c))
+  huge <- as.raw(c(0x03, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00))
+  bad <- tempfile(fileext = ".beve")
+  writeBin(c(bytes[seq_len(at - 1L)], huge, bytes[-seq_len(at)]), bad)
+  expect_error(read_beve_stan(bad), "100 x 2147483648 is too large for an R matrix")
+})
