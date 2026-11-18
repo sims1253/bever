@@ -1,6 +1,7 @@
 use extendr_api::prelude::*;
 use serde::de::{self, Deserializer, SeqAccess, Visitor};
 use serde::Deserialize;
+use std::cell::Cell;
 use std::fmt;
 
 /// The object the sims1253/cmdstan BEVE writer serialises:
@@ -66,24 +67,56 @@ impl<'de> Visitor<'de> for ColumnsVisitor {
     }
 }
 
-/// Allocate the matrix, or refuse dimensions R would reject. R raises its own
-/// error by a long jump that skips Rust cleanup, so it must not see them.
+thread_local! {
+    /// The length of the file that read() is parsing, for new_matrix() to check.
+    static FILE_LEN: Cell<Option<u64>> = const { Cell::new(None) };
+}
+
+/// Sets FILE_LEN while it lives and clears it when dropped, on every exit path.
+struct FileLen;
+
+impl FileLen {
+    fn set(len: u64) -> Self {
+        FILE_LEN.with(|c| c.set(Some(len)));
+        FileLen
+    }
+}
+
+impl Drop for FileLen {
+    fn drop(&mut self) {
+        FILE_LEN.with(|c| c.set(None));
+    }
+}
+
+/// Allocate the matrix, or refuse dimensions R would reject or the file cannot
+/// fill. R raises its own error by a long jump that skips Rust cleanup, so it
+/// must not see them.
 fn new_matrix<E: de::Error>(nrow: usize, ncol: usize) -> std::result::Result<RMatrix<f64>, E> {
     // R_XLEN_T_MAX, the longest vector R allocates.
     const R_MAX_LEN: usize = 1 << 52;
     let fits = |n: usize| i32::try_from(n).is_ok();
-    match nrow.checked_mul(ncol) {
-        Some(len) if fits(nrow) && fits(ncol) && len <= R_MAX_LEN => Ok(RMatrix::new(nrow, ncol)),
-        _ => Err(E::custom(format!(
-            "{nrow} x {ncol} is too large for an R matrix"
-        ))),
+    let len = nrow
+        .checked_mul(ncol)
+        .filter(|&len| fits(nrow) && fits(ncol) && len <= R_MAX_LEN)
+        .ok_or_else(|| E::custom(format!("{nrow} x {ncol} is too large for an R matrix")))?;
+    let bytes = len as u64 * 8;
+    let file_len = FILE_LEN.with(Cell::get).unwrap_or(u64::MAX);
+    if bytes > file_len {
+        return Err(E::custom(format!(
+            "{nrow} x {ncol} needs {bytes} bytes, more than the file's {file_len}"
+        )));
     }
+    Ok(RMatrix::new(nrow, ncol))
 }
 
 fn read(path: &str) -> std::result::Result<RMatrix<f64>, String> {
-    let file = std::fs::File::open(path).map_err(|e| format!("cannot read '{path}': {e}"))?;
-    let output: StanOutput = beve::from_reader_streaming(std::io::BufReader::new(file))
-        .map_err(|e| format!("cannot parse '{path}' as BEVE draws: {e}"))?;
+    let cannot_read = |e: std::io::Error| format!("cannot read '{path}': {e}");
+    let file = std::fs::File::open(path).map_err(cannot_read)?;
+    let output: StanOutput = {
+        let _len = FileLen::set(file.metadata().map_err(cannot_read)?.len());
+        beve::from_reader_streaming(std::io::BufReader::new(file))
+            .map_err(|e| format!("cannot parse '{path}' as BEVE draws: {e}"))?
+    };
 
     let mut m = output.data.0;
     let (nrow, ncol) = (m.nrows(), m.ncols());
