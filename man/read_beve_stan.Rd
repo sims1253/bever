@@ -2,16 +2,27 @@
 % Please edit documentation in R/read_beve.R
 \name{read_beve_stan}
 \alias{read_beve_stan}
-\title{Read BEVE file from CmdStan}
+\title{Read a BEVE draws file written by the sims1253/cmdstan fork}
 \usage{
 read_beve_stan(path)
 }
 \arguments{
-\item{path}{Path to the .beve file}
+\item{path}{Path to the `.beve` file.}
 }
 \value{
-A matrix with named columns containing posterior samples
+A double matrix with one row per draw and one column per CmdStan
+  output column (for sampling: `lp__`, the sampler diagnostics ending in
+  `__`, then the model's parameters). Column names are the CmdStan names,
+  such as `"theta[1]"`.
 }
 \description{
-Read BEVE file from CmdStan
+Reads a `.beve` file that revision 64659d8 of the experimental
+`sims1253/cmdstan` fork wrote with `output format=beve`. Later revisions of
+the fork do not write this format, and no released CmdStan writes it.
+}
+\examples{
+path <- system.file("extdata", "draws.beve", package = "bever")
+draws <- read_beve_stan(path)
+dim(draws)
+summary(draws[, "mu"])
 }

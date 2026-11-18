@@ -11,11 +11,14 @@
 #' @useDynLib bever, .registration = TRUE
 NULL
 
-#' Read a BEVE file produced by CmdStan
-#' @param path Path to the .beve file
-#' @return A named list with 'matrix' (the draws) and 'names' (column names)
-#' @export
+#' Read a BEVE draws file into a matrix (internal; see read_beve_stan()).
+#' Returns the matrix, or the error message as a string for R to raise,
+#' so errors never unwind through a Rust panic.
+#' @param path Path to the .beve file.
+#' @noRd
 read_beve <- function(path) .Call(wrap__read_beve, path)
+
+
 
 
 # nolint end

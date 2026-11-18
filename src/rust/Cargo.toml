@@ -2,11 +2,12 @@
 name = "bever"
 version = "0.1.0"
 edition = "2021"
+rust-version = "1.96.1"
 
 [lib]
 crate-type = ["staticlib"]
 
 [dependencies]
-extendr-api = "0.6"
-beve = "0.4"
+extendr-api = "0.9"
+beve = "10"
 serde = { version = "1", features = ["derive"] }
