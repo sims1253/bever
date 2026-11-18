@@ -93,11 +93,11 @@ impl Drop for FileLen {
 /// must not see them.
 fn new_matrix<E: de::Error>(nrow: usize, ncol: usize) -> std::result::Result<RMatrix<f64>, E> {
     // R_XLEN_T_MAX, the longest vector R allocates.
-    const R_MAX_LEN: usize = 1 << 52;
+    const R_MAX_LEN: u64 = 1 << 52;
     let fits = |n: usize| i32::try_from(n).is_ok();
     let len = nrow
         .checked_mul(ncol)
-        .filter(|&len| fits(nrow) && fits(ncol) && len <= R_MAX_LEN)
+        .filter(|&len| fits(nrow) && fits(ncol) && len as u64 <= R_MAX_LEN)
         .ok_or_else(|| E::custom(format!("{nrow} x {ncol} is too large for an R matrix")))?;
     let bytes = len as u64 * 8;
     let file_len = FILE_LEN.with(Cell::get).unwrap_or(u64::MAX);
